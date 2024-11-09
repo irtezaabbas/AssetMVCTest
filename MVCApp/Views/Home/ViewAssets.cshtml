@@ -1,4 +1,4 @@
-﻿@model IEnumerable<MVCApp.Models.InventoryModel>
+@model IEnumerable<MVCApp.Models.InventoryModel>
 
 @{
     ViewBag.Title = "ViewAssets";
@@ -7,7 +7,7 @@
 <h2>View Assigned Assets</h2>
 
 <p>
-    @Html.ActionLink("Create New", "AssignAsset")
+    @Html.ActionLink("Create New", "AssignDevice")
 </p>
 <table class="table">
     <tr>
@@ -47,11 +47,12 @@
             @Html.DisplayFor(modelItem => item.AssignedOn)
         </td>
         <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
-            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+            @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+            @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+            @Html.ActionLink("Delete", "Delete", new { id = item.Id })
         </td>
     </tr>
 }
 
 </table>
+

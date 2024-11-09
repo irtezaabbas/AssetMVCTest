@@ -1,0 +1,57 @@
+﻿@model IEnumerable<MVCApp.Models.InventoryModel>
+
+@{
+    ViewBag.Title = "ViewAssets";
+}
+
+<h2>View Assigned Assets</h2>
+
+<p>
+    @Html.ActionLink("Create New", "AssignAsset")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.AssetTag)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AssetState)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.UsedBy)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.UsageType)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AssignedOn)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.AssetTag)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.AssetState)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.UsedBy)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.UsageType)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.AssignedOn)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
+            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+        </td>
+    </tr>
+}
+
+</table>

@@ -38,5 +38,12 @@ namespace DataLibrary.Logic
             HttpResponseMessage response = await client.PutAsync($"https://yourdomain.freshservice.com/api/v2/assets/{asset.Id}", content);
             response.EnsureSuccessStatusCode();
         }
+
+        // Add this method to fetch valid asset tags from Freshservice
+        public static async Task<List<string>> GetValidAssetTags(string apiKey)
+        {
+            var assets = await GetAssetsFromFreshserviceAsync(apiKey);
+            return assets.Select(a => a.AssetTag).ToList();
+        }
     }
 }

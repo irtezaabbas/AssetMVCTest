@@ -2,16 +2,27 @@ using MVCApp.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 using DataLibrary;
 using static DataLibrary.Logic.AssetManager;
+using DataLibrary.Logic;
 
 namespace MVCApp.Controllers
 {
     public class HomeController : Controller
     {
         private readonly string apiKey = "your_freshservice_api_key"; // Securely store your API key
+        private static List<string> validAssetTags;
+
+        public HomeController()
+        {
+            // Fetch valid asset tags once when the controller is instantiated
+            if (validAssetTags == null)
+            {
+                validAssetTags = FreshserviceClient.GetValidAssetTags(apiKey).Result;
+            }
+        }
 
         public ActionResult Index()
         {
@@ -64,8 +75,15 @@ namespace MVCApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                await AssignAsset(model.AssetTag, model.UsedBy, model.AssignedOn, apiKey); // Assign asset and update Freshservice
-                return RedirectToAction("ViewAssets"); // Redirect to view assets list
+                if (validAssetTags.Contains(model.AssetTag))
+                {
+                    await AssignAsset(model.AssetTag, model.UsedBy, model.AssignedOn, apiKey); // Assign asset and update Freshservice
+                    return RedirectToAction("ViewAssets"); // Redirect to view assets list
+                }
+                else
+                {
+                    ModelState.AddModelError("AssetTag", "Invalid Asset Tag. Please enter a valid tag from Freshservice.");
+                }
             }
 
             return View(model);

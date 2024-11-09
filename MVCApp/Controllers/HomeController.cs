@@ -1,4 +1,4 @@
-﻿using MVCApp.Models;
+using MVCApp.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +11,8 @@ namespace MVCApp.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly string apiKey = "your_freshservice_api_key"; // Securely store your API key
+
         public ActionResult Index()
         {
             return View();
@@ -19,14 +21,12 @@ namespace MVCApp.Controllers
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";
-
             return View();
         }
 
         public ActionResult Contact()
         {
             ViewBag.Message = "Your contact page.";
-
             return View();
         }
 
@@ -34,8 +34,8 @@ namespace MVCApp.Controllers
         {
             ViewBag.Message = "Assigned Assets List";
 
-            var data = LoadAssets();
-            List<InventoryModel> assets = new List<InventoryModel>(); 
+            var data = LoadAssets(); // Load from local database
+            List<InventoryModel> assets = new List<InventoryModel>();
 
             foreach (var row in data)
             {
@@ -51,27 +51,24 @@ namespace MVCApp.Controllers
 
             return View(assets);
         }
+
         public ActionResult AssignDevice()
         {
             ViewBag.Message = "Assign Device";
-
             return View();
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult AssignDevice(InventoryModel model)
+        public async Task<ActionResult> AssignDevice(InventoryModel model)
         {
             if (ModelState.IsValid)
             {
-                int recordsCreated = CreateAsset(model.AssetTag,
-                    model.AssetState, 
-                    model.UsedBy, 
-                    model.UsageType, 
-                    model.AssignedOn);
-                return RedirectToAction("AssignDevice");
+                await AssignAsset(model.AssetTag, model.UsedBy, model.AssignedOn, apiKey); // Assign asset and update Freshservice
+                return RedirectToAction("ViewAssets"); // Redirect to view assets list
             }
 
-            return View();
+            return View(model);
         }
     }
 }

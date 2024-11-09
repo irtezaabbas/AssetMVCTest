@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using DataLibrary.DataAccess;
 using DataLibrary.Models;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using Newtonsoft.Json;
 
 namespace DataLibrary.Logic
 {
@@ -19,11 +16,12 @@ namespace DataLibrary.Logic
                 AssetState = AssetState,
                 UsedBy = UsedBy,
                 UsageType = UsageType,
-                AssignedOn = AssignedOn
+                AssignedOn = AssignedOn,
+                LastModified = DateTime.Now
             };
 
-            string sql = @"insert into dbo.Assets (AssetTag, AssetState, UsedBy, UsageType, AssignedOn)
-                           values(@AssetTag, @AssetState, @UsedBy, @UsageType, @AssignedOn);";
+            string sql = @"insert into dbo.Assets (AssetTag, AssetState, UsedBy, UsageType, AssignedOn, LastModified)
+                           values(@AssetTag, @AssetState, @UsedBy, @UsageType, @AssignedOn, @LastModified);";
 
             return SQLDataAccess.SaveData(sql, data);
         }
@@ -38,12 +36,6 @@ namespace DataLibrary.Logic
         public static async Task<List<AssetModel>> LoadAssetsFromFreshservice(string apiKey)
         {
             var freshserviceAssets = await FreshserviceClient.GetAssetsFromFreshserviceAsync(apiKey);
-
-            foreach (var asset in freshserviceAssets)
-            {
-                CreateAsset(asset.AssetTag, asset.AssetState, asset.UsedBy, asset.UsageType, asset.AssignedOn);
-            }
-
             return freshserviceAssets;
         }
 
@@ -65,6 +57,27 @@ namespace DataLibrary.Logic
             {
                 await FreshserviceClient.UpdateAssetInFreshserviceAsync(apiKey, asset);
             }
+        }
+
+        public static async Task AssignAsset(string assetTag, string assignedTo, DateTime assignedOn, string apiKey)
+        {
+            AssetModel asset = new AssetModel
+            {
+                AssetTag = assetTag,
+                UsedBy = assignedTo,
+                AssignedOn = assignedOn,
+                AssetState = "Assigned",
+                LastModified = DateTime.Now
+            };
+
+            CreateAsset(asset.AssetTag, asset.AssetState, asset.UsedBy, asset.UsageType, asset.AssignedOn);
+            await UpdateFreshserviceAsync(apiKey, asset);
+        }
+
+        public static List<AssetModel> ViewAssignedAssets()
+        {
+            string sql = @"select Id, AssetTag, AssetState, UsedBy, UsageType, AssignedOn from dbo.Assets where AssetState = 'Assigned';";
+            return SQLDataAccess.LoadData<AssetModel>(sql);
         }
     }
 }

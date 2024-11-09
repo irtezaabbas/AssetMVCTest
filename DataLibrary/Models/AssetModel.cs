@@ -14,6 +14,7 @@ namespace DataLibrary.Models
         public string UsedBy { get; set; }
         public string UsageType { get; set; }
         public DateTime AssignedOn { get; set; }
+        public DateTime LastModified { get; set;
 
     }
 }
